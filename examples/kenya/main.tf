@@ -2,7 +2,7 @@
 # Deploys dual PostgreSQL + KYC for CBK compliance (Central Bank of Kenya)
 
 module "compliance_db" {
-  source = "github.com/amani-amina-anai/terraform-aws-compliance-db"
+  source = "app.terraform.io/gtcx-protocol/compliancedb/aws"
 
   environment  = "kenya-prod"
   jurisdiction = "kenya"

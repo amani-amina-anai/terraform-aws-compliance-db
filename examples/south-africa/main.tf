@@ -1,23 +1,24 @@
-# Zimbabwe Pilot — Compliance DB Example
-# Deploys dual PostgreSQL + KYC storage for ZWCMP compliance
+# South Africa — Compliance DB Example
+# POPIA-compliant dual PostgreSQL + KYC for SARB-regulated entities
 
 module "compliance_db" {
-  source = "app.terraform.io/gtcx-protocol/compliancedb/aws"
+  source  = "app.terraform.io/gtcx-protocol/compliancedb/aws"
+  version = "1.1.0"
 
-  environment  = "zimbabwe-pilot"
-  jurisdiction = "zimbabwe"
-  region       = "af-south-1"
+  environment  = "za-prod"
+  jurisdiction = "south_africa"
+  region       = "af-south-1" # Cape Town — in-country data residency
 
   vpc_id     = var.vpc_id
   subnet_ids = var.subnet_ids
 
-  # Database sizing (evaluation tier)
-  operational_instance_class = "db.t3.micro"
-  operational_storage_gb     = 20
-  multi_az                   = false
+  # Production sizing
+  operational_instance_class = "db.t3.medium"
+  operational_storage_gb     = 100
+  multi_az                   = true
   deletion_protection        = true
 
-  # KYC document storage
+  # KYC — FICA §22 requires 5 years
   enable_kyc_storage    = true
   eks_oidc_provider_arn = var.eks_oidc_provider_arn
   eks_oidc_provider_url = var.eks_oidc_provider_url
@@ -25,9 +26,10 @@ module "compliance_db" {
   allowed_security_groups = var.allowed_security_groups
 
   tags = {
-    Country    = "Zimbabwe"
-    Regulator  = "ZWCMP"
-    CostCenter = "zw-pilot"
+    Country    = "South Africa"
+    Regulator  = "SARB"
+    Compliance = "POPIA, FICA"
+    CostCenter = "za-prod"
   }
 }
 
@@ -39,4 +41,4 @@ variable "allowed_security_groups" { type = list(string) }
 
 output "operational_endpoint" { value = module.compliance_db.operational_endpoint }
 output "audit_endpoint" { value = module.compliance_db.audit_endpoint }
-output "kyc_bucket" { value = module.compliance_db.kyc_bucket_name }
+output "jurisdiction" { value = module.compliance_db.jurisdiction_metadata }
